@@ -23,65 +23,57 @@ class Command(BaseCommand):
         db.leaderboard.drop()
         db.workouts.drop()
 
-        # Create users
 
-        # Create users
-        users = [
-            User(_id=ObjectId(), email='thundergod@mhigh.edu', name='Thunder God', team='Blue Team', is_active=True),
-            User(_id=ObjectId(), email='metalgeek@mhigh.edu', name='Metal Geek', team='Blue Team', is_active=True),
-            User(_id=ObjectId(), email='zerocool@mhigh.edu', name='Zero Cool', team='Blue Team', is_active=True),
-            User(_id=ObjectId(), email='crashoverride@mhigh.edu', name='Crash Override', team='Gold Team', is_active=True),
-            User(_id=ObjectId(), email='sleeptoken@mhigh.edu', name='Sleep Token', team='Gold Team', is_active=True),
-        ]
-        User.objects.bulk_create(users)
-
-        # Create teams
-        blue_team = Team(
-            _id=ObjectId(),
-            name='Blue Team',
-            members=[
-                {'_id': users[0]._id, 'email': users[0].email, 'name': users[0].name, 'team': users[0].team, 'is_active': users[0].is_active},
-                {'_id': users[1]._id, 'email': users[1].email, 'name': users[1].name, 'team': users[1].team, 'is_active': users[1].is_active},
-                {'_id': users[2]._id, 'email': users[2].email, 'name': users[2].name, 'team': users[2].team, 'is_active': users[2].is_active},
-            ]
-        )
-        gold_team = Team(
-            _id=ObjectId(),
-            name='Gold Team',
-            members=[
-                {'_id': users[3]._id, 'email': users[3].email, 'name': users[3].name, 'team': users[3].team, 'is_active': users[3].is_active},
-                {'_id': users[4]._id, 'email': users[4].email, 'name': users[4].name, 'team': users[4].team, 'is_active': users[4].is_active},
-            ]
-        )
-        blue_team.save()
-        gold_team.save()
-
-        # Create activities
+        # Insert test data directly using pymongo
         from datetime import datetime
+        # Users
+        users = [
+            {"_id": ObjectId(), "email": "thundergod@mhigh.edu", "name": "Thunder God", "team": "Blue Team", "is_active": True},
+            {"_id": ObjectId(), "email": "metalgeek@mhigh.edu", "name": "Metal Geek", "team": "Blue Team", "is_active": True},
+            {"_id": ObjectId(), "email": "zerocool@mhigh.edu", "name": "Zero Cool", "team": "Blue Team", "is_active": True},
+            {"_id": ObjectId(), "email": "crashoverride@mhigh.edu", "name": "Crash Override", "team": "Gold Team", "is_active": True},
+            {"_id": ObjectId(), "email": "sleeptoken@mhigh.edu", "name": "Sleep Token", "team": "Gold Team", "is_active": True},
+        ]
+        db.users.insert_many(users)
+
+        # Teams
+        blue_team = {
+            "_id": ObjectId(),
+            "name": "Blue Team",
+            "members": users[:3],
+        }
+        gold_team = {
+            "_id": ObjectId(),
+            "name": "Gold Team",
+            "members": users[3:],
+        }
+        db.teams.insert_many([blue_team, gold_team])
+
+        # Activities
         activities = [
-            Activity(_id=ObjectId(), user=users[0].email, activity_type='Cycling', duration=1.0, date=datetime(2025, 6, 1, 9, 0)),
-            Activity(_id=ObjectId(), user=users[1].email, activity_type='Crossfit', duration=2.0, date=datetime(2025, 6, 2, 10, 0)),
-            Activity(_id=ObjectId(), user=users[2].email, activity_type='Running', duration=1.5, date=datetime(2025, 6, 3, 8, 30)),
-            Activity(_id=ObjectId(), user=users[3].email, activity_type='Strength', duration=0.5, date=datetime(2025, 6, 4, 7, 45)),
-            Activity(_id=ObjectId(), user=users[4].email, activity_type='Swimming', duration=1.25, date=datetime(2025, 6, 5, 11, 15)),
+            {"_id": ObjectId(), "user": users[0]["email"], "activity_type": "Cycling", "duration": 1.0, "date": datetime(2025, 6, 1, 9, 0)},
+            {"_id": ObjectId(), "user": users[1]["email"], "activity_type": "Crossfit", "duration": 2.0, "date": datetime(2025, 6, 2, 10, 0)},
+            {"_id": ObjectId(), "user": users[2]["email"], "activity_type": "Running", "duration": 1.5, "date": datetime(2025, 6, 3, 8, 30)},
+            {"_id": ObjectId(), "user": users[3]["email"], "activity_type": "Strength", "duration": 0.5, "date": datetime(2025, 6, 4, 7, 45)},
+            {"_id": ObjectId(), "user": users[4]["email"], "activity_type": "Swimming", "duration": 1.25, "date": datetime(2025, 6, 5, 11, 15)},
         ]
-        Activity.objects.bulk_create(activities)
+        db.activity.insert_many(activities)
 
-        # Create workouts
+        # Workouts
         workouts = [
-            Workout(_id=ObjectId(), user=users[0].email, workout_type='Cycling', details={"goal": "Road cycling event"}, date=datetime(2025, 6, 1, 9, 0)),
-            Workout(_id=ObjectId(), user=users[1].email, workout_type='Crossfit', details={"goal": "Crossfit competition"}, date=datetime(2025, 6, 2, 10, 0)),
-            Workout(_id=ObjectId(), user=users[2].email, workout_type='Running', details={"goal": "Marathon"}, date=datetime(2025, 6, 3, 8, 30)),
-            Workout(_id=ObjectId(), user=users[3].email, workout_type='Strength', details={"goal": "Strength training"}, date=datetime(2025, 6, 4, 7, 45)),
-            Workout(_id=ObjectId(), user=users[4].email, workout_type='Swimming', details={"goal": "Swimming competition"}, date=datetime(2025, 6, 5, 11, 15)),
+            {"_id": ObjectId(), "user": users[0]["email"], "workout_type": "Cycling", "details": {"goal": "Road cycling event"}, "date": datetime(2025, 6, 1, 9, 0)},
+            {"_id": ObjectId(), "user": users[1]["email"], "workout_type": "Crossfit", "details": {"goal": "Crossfit competition"}, "date": datetime(2025, 6, 2, 10, 0)},
+            {"_id": ObjectId(), "user": users[2]["email"], "workout_type": "Running", "details": {"goal": "Marathon"}, "date": datetime(2025, 6, 3, 8, 30)},
+            {"_id": ObjectId(), "user": users[3]["email"], "workout_type": "Strength", "details": {"goal": "Strength training"}, "date": datetime(2025, 6, 4, 7, 45)},
+            {"_id": ObjectId(), "user": users[4]["email"], "workout_type": "Swimming", "details": {"goal": "Swimming competition"}, "date": datetime(2025, 6, 5, 11, 15)},
         ]
-        Workout.objects.bulk_create(workouts)
+        db.workouts.insert_many(workouts)
 
-        # Create leaderboard entries
+        # Leaderboard
         leaderboard_entries = [
-            Leaderboard(_id=ObjectId(), team='Blue Team', score=285, rank=1),
-            Leaderboard(_id=ObjectId(), team='Gold Team', score=165, rank=2),
+            {"_id": ObjectId(), "team": "Blue Team", "score": 285, "rank": 1},
+            {"_id": ObjectId(), "team": "Gold Team", "score": 165, "rank": 2},
         ]
-        Leaderboard.objects.bulk_create(leaderboard_entries)
+        db.leaderboard.insert_many(leaderboard_entries)
 
         self.stdout.write(self.style.SUCCESS('Successfully populated the database with test data.'))
